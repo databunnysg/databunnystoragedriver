@@ -1,0 +1,6 @@
+dist/
+build/
+src/databunny*
+.vscode/
+doc/
+*.pyc
