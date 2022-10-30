@@ -4,3 +4,5 @@ src/databunny*
 .vscode/
 doc/
 *.pyc
+build.sh
+*.egg-info

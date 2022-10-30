@@ -1,55 +1,8 @@
 CHANGES
 =======
 
-* Fix pep8 failures
-* Bump version to 2.0.0
-* Updated README
-* Upgrade to API v2.0 and fix issue 20
-* Add BSD LICENSE
-* fix issue 4
-* Python3 Compatibility Changes
-
-v1.0
-----
-
-* Adding storage env file for RDO Tripleo Deployment
-* updating ip
-* Create Dockerfile for integrating this driver
-* Update for open source version
-* Add missing instruction:
+* update setup.cfg with home github url
+* add license
 * Update README.md
 * Update README.md
-* Revert "Large bulk rename of FreeNAS -> TrueNAS in our Cinder driver"
-* Revert "Use iXsystem\_FREENAS\_Storage for volume\_backend name"
-* Update volume backend name
-* Use iXsystem\_FREENAS\_Storage for volume\_backend name
-* Update README.md
-* Update README.md
-* Update README.md
-* Update README.md
-* Large bulk rename of FreeNAS -> TrueNAS in our Cinder driver
-* Edit README
-* Fix directory path
-* Correct the location of cinder repo in Readme
-* Removed osl\_units for converting size in bytes
-* Added support for openstack cinder newton version
-* ixsystem is renamed to ixsystems
-* Updated README.md
-* Updated README.md
-* Updated READ.md
-* Updated README.md
-* Removed sample cinder.conf files. Updated sample cinder.conf file is added to the repository
-* Updated README.md
-* Made changes in order to support Newton version of OpenStack oslo\_conf is devstack library version of oslo.conf. It gets installed by default with DevStack Newton version
-* The two configurable parameters are added 1) vender name 2) protocol name
-* Added following two configurational parameters in cinder.conf.sample file 1. ixsystems\_vendor\_name 2. ixsystems\_storage\_protocol
-* \* Fixed Following issues  1) iscsi.py - volumes\_stat function : available volume space stat was incorrect. Fixed this issue.  2) options.py - added to config parameters.     i> ixsystems\_storage\_protocol     ii> ixsystems\_vendor\_name
-* Edits in Cloned Volume API Snapshot to Cloned Volume mapping is written. A total of two functions written 1. \_create\_cloned\_volume\_to\_snapshot\_map - create mapping between snapshot and cloned volume 2. \_delete\_cloned\_volume\_to\_snapshot\_map - read mapping, delete snapshot and delete mapping
-* Added Extend Volume API (Resize Volume) Source Code in iscsi.py file. API is unit tested
-* Added 4 more APIs in iscsi.py file. Following are the APIs added - 1) copy volume to image 2) copy image to volume 3) attach volume 4) detach volume
-* Updated README.md. Added Source Code related information
-* Added iXsystems Cinder Driver code. 6 out of 11 APIs implemented and Unit Tested. APIs Completed - 1. Volume Create 2. Volume Delete 3. Snapshot Create 4. Snapshot Delete 5. Create Volume from Snapshot 6. Get Volume Stats 7. List Volume Please refer the doc folder for more details about the driver
-* Created directory 'driver' to hold Cinder driver specific code
-* Added Cinder Design document. Both .docx and .pdf files are added under doc folder
-* Created doc directory and added Cinder Solution Overview document in the same
-* Initial commit
+* init commit

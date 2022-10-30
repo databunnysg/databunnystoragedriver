@@ -13,8 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import setuptools
+from setuptools import setup,find_packages
 
-setuptools.setup(
+setup(
+    packages=find_packages(where="src",exclude=['test*']),
+    package_dir={"":"src","driver":"src/driver"},
     setup_requires=['pbr>=2.0.0'],
     pbr=True)

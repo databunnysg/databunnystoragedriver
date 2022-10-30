@@ -21,7 +21,7 @@ def get_size_in_gb(size_in_bytes):
 
 def get_bytes_from_gb(size_in_gb):
     """Convert size from GB into bytes."""
-    return int(size_in_gb) * (1024 * 1024 * 1024)
+    return size_in_gb * (1024 * 1024 * 1024)
 
 
 def generate_freenas_volume_name(name, iqn_prefix):
