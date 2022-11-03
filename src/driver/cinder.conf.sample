@@ -27,8 +27,8 @@ logging_default_format_string = %(asctime)s.%(msecs)03d %(color)s%(levelname)s %
 logging_context_format_string = %(asctime)s.%(msecs)03d %(color)s%(levelname)s %(name)s [[01;36m%(request_id)s [00;36m%(user_id)s %(project_id)s%(color)s] [01;35m%(instance)s%(color)s%(message)s[00m
 volume_clear = zero
 transport_url = rabbit://stackrabbit:naruto@10.3.1.84:5672/
-default_volume_type = ixsystems-iscsi
-enabled_backends = ixsystems-iscsi, lvmdriver-1
+default_volume_type = cinder-databunny-driver
+enabled_backends = cinder-databunny-driver, lvmdriver-1
 os_region_name = RegionOne
 my_ip = 10.3.1.84
 periodic_interval = 60
@@ -49,7 +49,7 @@ connection = mysql+pymysql://root:naruto@127.0.0.1/cinder?charset=utf8
 [oslo_concurrency]
 lock_path = /opt/stack/data/cinder
 
-[ixsystems-iscsi]
+[cinder-databunny-driver]
 iscsi_helper = tgtadm
 volume_dd_blocksize = 512
 volume_driver = driver.iscsi.FreeNASISCSIDriver

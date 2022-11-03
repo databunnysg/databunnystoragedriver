@@ -19,19 +19,20 @@ import json
 import os,sys
 import urllib.parse
 sys.path.append(os.path.abspath(".."))
-#sys.path.append(os.path.abspath("./test"))
+#sys.path.append(os.path.abspath(".."))
+# os.chdir(os.path.abspath("../.."))
 import configparser
 from driver import utils as ix_utils
 config = configparser.ConfigParser()
-config.read("./src/test/cinder.conf")        
+    
 def createvolume(name,size):
     name,size=("test",1)
-    freenas = FreeNASServer(config['ixsystems-iscsi']['ixsystems_server_hostname']
-                            ,config['ixsystems-iscsi']['ixsystems_server_port']
-                                    ,config['ixsystems-iscsi']['ixsystems_login']
-                                    ,config['ixsystems-iscsi']['ixsystems_password'])
+    freenas = FreeNASServer(config['cinder-databunny-driver']['ixsystems_server_hostname']
+                            ,config['cinder-databunny-driver']['ixsystems_server_port']
+                                    ,config['cinder-databunny-driver']['ixsystems_login']
+                                    ,config['cinder-databunny-driver']['ixsystems_password'])
     params = {}
-    params['name'] = config['ixsystems-iscsi']['ixsystems_dataset_path'] + '/' + name
+    params['name'] = config['cinder-databunny-driver']['ixsystems_dataset_path'] + '/' + name
     params['type'] = 'VOLUME'
     params['volsize'] = ix_utils.get_bytes_from_gb(size)
     jparams = json.dumps(params)
@@ -46,14 +47,14 @@ def createvolume(name,size):
     return True
 def delvolume(name):
     name,size=("test",1)
-    freenas = FreeNASServer(config['ixsystems-iscsi']['ixsystems_server_hostname']
-                            ,config['ixsystems-iscsi']['ixsystems_server_port']
-                                    ,config['ixsystems-iscsi']['ixsystems_login']
-                                    ,config['ixsystems-iscsi']['ixsystems_password'])
+    freenas = FreeNASServer(config['cinder-databunny-driver']['ixsystems_server_hostname']
+                            ,config['cinder-databunny-driver']['ixsystems_server_port']
+                                    ,config['cinder-databunny-driver']['ixsystems_login']
+                                    ,config['cinder-databunny-driver']['ixsystems_password'])
     request_urn = ('%s/id/%s%s') % (
         FreeNASServer.REST_API_VOLUME,
         urllib.parse.quote_plus(
-            config['ixsystems-iscsi']['ixsystems_dataset_path'] + '/'),
+            config['cinder-databunny-driver']['ixsystems_dataset_path'] + '/'),
         name)
     ret = freenas.invoke_command(FreeNASServer.DELETE_COMMAND,
                                         request_urn, None)
@@ -62,11 +63,78 @@ def delvolume(name):
         msg = ('Error while creating volume: %s' % ret['response'])
         raise FreeNASApiError('Unexpected error', msg)
     return True
+def update_volume_stats():
+        """Retrieve stats info from volume group.
+
+           REST API: $ GET /pools/mypool "size":95,"allocated":85,
+        """
+        # HACK: for now, use an API v1.0 call to get
+        # these stats until available in v2.0 API
+        freenas = FreeNASServer(config['cinder-databunny-driver']['ixsystems_server_hostname']
+                            ,config['cinder-databunny-driver']['ixsystems_server_port']
+                                    ,config['cinder-databunny-driver']['ixsystems_login']
+                                    ,config['cinder-databunny-driver']['ixsystems_password'])
+        #freenas.set_api_version('v2.0')
+        #for api v1.0
+        #request_urn = ('%s/%s/') % (
+        #    '/storage/volume',
+        #    config['cinder-databunny-driver']['ixsystems_datastore_pool'])
+        
+        #for api v2.0
+        request_urn = ('%s') % ('/pool')
+        config['cinder-databunny-driver']['ixsystems_datastore_pool']
+        ret = freenas.invoke_command(FreeNASServer.SELECT_COMMAND,
+                                         request_urn, None)
+        retresult = json.loads(ret['response'])
+        for retitem in retresult:
+            if retitem['name']==config['cinder-databunny-driver']['ixsystems_datastore_pool']:
+                size= retitem['topology']['data'][0]['stats']['size']
+                used = retitem['topology']['data'][0]['stats']['allocated']
+                print("avail"+str(size))
+                print("used"+str(used))
+                                   
+        data = {}
+        #avail = json.loads(ret['response'])['avail']
+        #used = json.loads(ret['response'])['used']
+        data["volume_backend_name"] = config['cinder-databunny-driver']['ixsystems_volume_backend_name']
+        data["vendor_name"] = config['cinder-databunny-driver']['ixsystems_vendor_name']
+        data["driver_version"] = config['cinder-databunny-driver']['ixsystems_api_version']
+        data["storage_protocol"] = config['cinder-databunny-driver']['ixsystems_storage_protocol']
+        data['total_capacity_gb'] = ix_utils.get_size_in_gb(size)
+        data['free_capacity_gb'] = ix_utils.get_size_in_gb(used)
+        data['reserved_percentage'] = (
+            config['cinder-databunny-driver']['ixsystems_reserved_percentage'])
+        data['reserved_percentage'] = 0
+        data['QoS_support'] = False
+
+        # set back to v2.0 api for other calls...
+        #freenas.set_api_version('v2.0')
+        return data
 class testfreenasapi(unittest.TestCase):
-    def testcreatevolume(self):
+    def testcreatevolumefreenas(self):
+        global config
+        config.read("./src/test/cindertruenas13.conf")    
         assert createvolume("test",1)
-    def testdelvolume(self):
+    def testdelvolumefreenas(self):
+        global config
+        config.read("./src/test/cindertruenas13.conf")    
         assert delvolume("test")    
+    def testcreatevolumetruenasscale(self):
+        global config
+        config.read("./src/test/cindertruenasscale.conf")    
+        assert createvolume("test",1)
+    def testdelvolumetruenasscale(self):
+        global config
+        config.read("./src/test/cindertruenasscale.conf")    
+        assert delvolume("test")     
+    def testtruenassstats(self):
+        global config
+        config.read("./src/test/cindertruenas13.conf")    
+        assert update_volume_stats()               
+    def testtruenassscalestats(self):
+        global config
+        config.read("./src/test/cindertruenasscale.conf")            
+        assert update_volume_stats()
         
 if __name__ == '__main__':
     unittest.main()

@@ -414,34 +414,31 @@ class TrueNASCommon(object):
 
            REST API: $ GET /pools/mypool "size":95,"allocated":85,
         """
-        # HACK: for now, use an API v1.0 call to get
-        # these stats until available in v2.0 API
-        self.handle.set_api_version('v1.0')
-        request_urn = ('%s/%s/') % (
-            '/storage/volume',
-            self.configuration.ixsystems_datastore_pool)
-        LOG.debug('_update_volume_stats request_urn : %s', request_urn)
+        request_urn = ('%s') % ('/pool')
         ret = self.handle.invoke_command(FreeNASServer.SELECT_COMMAND,
-                                         request_urn, None)
-        LOG.debug("_update_volume_stats response : %s", json.dumps(ret))
+                                         request_urn, None)        
+        retresult = json.loads(ret['response'])
+        for retitem in retresult:
+            if retitem['name']==self.configuration.ixsystems_datastore_pool:
+                size= retitem['topology']['data'][0]['stats']['size']
+                used = retitem['topology']['data'][0]['stats']['allocated']
+                #print("avail"+str(size))
+                #print("used"+str(used))
+        LOG.debug('_update_volume_stats request_urn : %s', request_urn)
+
         data = {}
         data["volume_backend_name"] = self.backend_name
         data["vendor_name"] = self.vendor_name
         data["driver_version"] = self.VERSION
         data["storage_protocol"] = self.storage_protocol
-        data['total_capacity_gb'] = ix_utils.get_size_in_gb(
-            json.loads(ret['response'])['avail'] +
-            json.loads(ret['response'])['used'])
-        data['free_capacity_gb'] = ix_utils.get_size_in_gb(
-            json.loads(ret['response'])['avail'])
+        data['total_capacity_gb'] = ix_utils.get_size_in_gb(size)
+        data['free_capacity_gb'] = ix_utils.get_size_in_gb(size-used)
         data['reserved_percentage'] = (
             self.configuration.ixsystems_reserved_percentage)
-        data['reserved_percentage'] = 0
+        #data['reserved_percentage'] = 0
         data['QoS_support'] = False
-
+        LOG.debug("_update_volume_stats response : %s", json.dumps(data))
         self.stats = data
-        # set back to v2.0 api for other calls...
-        self.handle.set_api_version('v2.0')
         return self.stats
 
     def _create_cloned_volume_to_snapshot_map(self, volume_name, snapshot):

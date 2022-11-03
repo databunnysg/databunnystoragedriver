@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* fix package build issue
 * update setup.cfg with home github url
 * add license
 * Update README.md
